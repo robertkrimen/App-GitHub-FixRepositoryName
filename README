@@ -1,0 +1,50 @@
+NAME
+    App::GitHub::FixRepositoryName - Fix your .git/config if you change the
+    case of your repository
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-app-github-fixrepositoryname at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-GitHub-FixRepository
+    Name>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc App::GitHub::FixRepositoryName
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitHub-FixRepositoryNa
+        me>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/App-GitHub-FixRepositoryName>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/App-GitHub-FixRepositoryName>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/App-GitHub-FixRepositoryName/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
