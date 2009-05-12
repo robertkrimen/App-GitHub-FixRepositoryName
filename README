@@ -16,9 +16,9 @@ SYNOPSIS
 
 DESCRIPTION
     App::GitHub::FixRepositoryName will automatically find and update the
-    github repository URLs in .git/config (so they have the right casing).
-    It will first make a backup of your .git/config AND it will prompt you
-    before writing out the new config (and show it to you first)
+    github repository URLs in .git/config (so that they have the right
+    casing). It will first make a backup of your .git/config AND it will
+    prompt you before writing out the new config (and show it to you first)
 
 INSTALL
         cpan -i App::GitHub::FixRepositoryName
@@ -28,7 +28,7 @@ USAGE
     A commandline application that will fix a given .git/config to have the
     right repository name(s)
 
-        Usage: github-fix-repository-name [...] <path>
+        Usage: github-fix-repository-name [...] <path1> <path2> ... 
 
             --backup-to <directory>     Backup 'config' to <directory> (default is the same directory)
 
@@ -41,6 +41,8 @@ USAGE
         For example:
 
             github-fix-repository-name .git/config
+
+            github-fix-repository-name My-Project1 xyzzy/My-Project2 # You can specify multiple
 
 AUTHOR
     Robert Krimen, "<rkrimen at cpan.org>"

@@ -27,7 +27,7 @@ our $VERSION = '0.01';
 
 =head1 DESCRIPTION
 
-App::GitHub::FixRepositoryName will automatically find and update the github repository URLs in .git/config (so they have
+App::GitHub::FixRepositoryName will automatically find and update the github repository URLs in .git/config (so that they have
 the right casing). It will first make a backup of your .git/config AND it will prompt you before writing out
 the new config (and show it to you first)
 
@@ -41,7 +41,7 @@ the new config (and show it to you first)
 
 A commandline application that will fix a given .git/config to have the right repository name(s)
 
-    Usage: github-fix-repository-name [...] <path>
+    Usage: github-fix-repository-name [...] <path1> <path2> ... 
 
         --backup-to <directory>     Backup 'config' to <directory> (default is the same directory)
 
@@ -54,6 +54,8 @@ A commandline application that will fix a given .git/config to have the right re
     For example:
 
         github-fix-repository-name .git/config
+
+        github-fix-repository-name My-Project1 xyzzy/My-Project2 # You can specify multiple
 
 =cut
 
