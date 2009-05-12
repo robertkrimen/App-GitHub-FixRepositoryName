@@ -67,6 +67,15 @@ sub scratch($;$) {
 
 {
     my $scratch = scratch '.git/config';
+    eval {
+        App::GitHub::FixRepositoryName->_try_to_fix_file_or_directory( $scratch->base, %options, backup_to => '/mnt' );
+    };
+    ok( $@ );
+    is( sha1_file $scratch->file( '.git/config' ), $bad_sha1 ); # File should be unchanged
+}
+
+{
+    my $scratch = scratch '.git/config';
     ($file, $backup) = App::GitHub::FixRepositoryName->_try_to_fix_file_or_directory( $scratch->base, %options );
     ok( $file );
     ok( $backup );
@@ -108,25 +117,30 @@ sub scratch($;$) {
     like( $backup, qr{somewhere/over/there/\.backup-config-20\d{2}-.*-.{6}} );
 }
 
-#is( App::GitHub::FindRepository->find( 'git://github.com/robertkrimen/Algorithm-BestChoice.git' ), 'git://github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( `script/github-find-repository git\@github.com:robertkrimen/dOc-SiMply.git --git-protocol`, "git\@github.com:robertkrimen/doc-simply.git\n" );
-#is( `script/github-find-repository git\@github.com:robertkrimen/dOc-SiMply.git`, "git\@github.com:robertkrimen/doc-simply.git\n" );
-#is( App::GitHub::FindRepository->find( 'robertkrimen,DBIx-Deploy' ), 'git://github.com/robertkrimen/dbix-deploy.git' );
-#is( App::GitHub::FindRepository->find( 'git://github.com/robertkrimen/Algorithm-bestChoice.git' ), 'git://github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( App::GitHub::FindRepository->find( 'robertkrimen,Algorithm-bestChoice' ), 'git://github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( App::GitHub::FindRepository->find( 'robertkrimen/Algorithm-BestChoice.git' ), 'git://github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( App::GitHub::FindRepository->find( 'robertkrimen/Algorithm-BestChoice' ), 'git://github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( App::GitHub::FindRepository->find( 'github.com/robertkrimen/Algorithm-BestChoice' ), 'github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( App::GitHub::FindRepository->find_by_git( 'git://github.com/robertkrimen/Algorithm-bestChoice.git' ), undef );
-#is( `script/github-find-repository robertkrimen,DBIx-Deploy`, "git://github.com/robertkrimen/dbix-deploy.git\n" );
-#is( `script/github-find-repository git://github.com/robertkrimen/alGorithm-bestChoIce.git`, "git://github.com/robertkrimen/Algorithm-BestChoice.git\n" );
-#is( `script/github-find-repository robertkrimen,DBIx-Deploy --getter curl`, "git://github.com/robertkrimen/dbix-deploy.git\n" );
-#is( `script/github-find-repository robertkrimen,DBIx-Deploy --getter LWP`, "git://github.com/robertkrimen/dbix-deploy.git\n" );
-#is( `script/github-find-repository robertkrimen,DBIx-Deploy --getter ^ --git-protocol`, "git://github.com/robertkrimen/dbix-deploy.git\n" );
-#is( App::GitHub::FindRepository->find( 'git@github.com/robertkrimen/aLgorithm-beStChoice.git' ), 'git@github.com/robertkrimen/Algorithm-BestChoice.git' );
-#is( `script/github-find-repository git\@github.com/robertkrimen/dOc-SiMply.git --git-protocol`, "git\@github.com/robertkrimen/doc-simply.git\n" );
-#is( `script/github-find-repository git\@github.com/robertkrimen/dOc-SiMply.git --output=private`, "git\@github.com:robertkrimen/doc-simply.git\n" );
-#is( `script/github-find-repository git\@github.com/robertkrimen/dOc-SiMply.git --output=public`, "git://github.com/robertkrimen/doc-simply.git\n" );
-#is( `script/github-find-repository git\@github.com/robertkrimen/dOc-SiMply.git --output=url`, "git\@github.com/robertkrimen/doc-simply.git\n" );
-#is( `script/github-find-repository git\@github.com/robertkrimen/dOc-SiMply.git --output=base`, "robertkrimen/doc-simply\n" );
-#is( `script/github-find-repository git\@github.com/robertkrimen/dOc-SiMply.git --output=name`, "doc-simply\n" );
+{
+    my $scratch = scratch 'config';
+    $scratch->touch( $_ ) for qw/branches hooks info objects refs/;
+    ($file, $backup) = App::GitHub::FixRepositoryName->_try_to_fix_file_or_directory( $scratch->base, %options );
+    ok( $file );
+    is( sha1_file $file, $good_sha1 );
+    ok( $backup );
+    is( sha1_file $backup, $bad_sha1 );
+    like( $backup, qr{\.backup-config-20\d{2}-.*-.{6}} );
+}
+
+{
+    my $scratch = scratch 'config';
+    eval {
+        App::GitHub::FixRepositoryName->_try_to_fix_file_or_directory( $scratch->base, %options );
+    };
+    like( $@, qr/Don't know how to fix directory/ );
+}
+
+{
+    my $scratch = scratch '.git/config';
+    ($file, $backup) = App::GitHub::FixRepositoryName->_try_to_fix_file_or_directory( $scratch->base->file( '.git/config' ), %options );
+    ok( $file );
+    ok( $backup );
+    like( $backup, qr{\.git/\.backup-config-20\d{2}-.*-.{6}} );
+}
+

@@ -4,6 +4,7 @@
 	bare = false
 	logallrefupdates = true
 [remote "origin"]
+	url = git://github.com/1.git
 	url = git://github.com/robertkrimen/aPp-GitHub-fInDRepository.git
 	url = git@github.com:robertkrimen/APp-GitHUb-findRepository.git
 	fetch = +refs/heads/*:refs/remotes/origin/*

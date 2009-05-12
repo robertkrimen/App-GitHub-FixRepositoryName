@@ -5,7 +5,9 @@ all_from 'lib/App/GitHub/FixRepositoryName.pm';
 author   'Robert Krimen <rkrimen@cpan.org>';
 license  'perl';
 
-resources repository => 'http://github.com/robertkrimen/PACKAGE/tree/master';
+resources repository => 'http://github.com/robertkrimen/App-GitHub-FixRepositoryName/tree/master';
+
+install_script 'github-fix-repository-name';
 
 {
     require ExtUtils::MakeMaker;
@@ -23,9 +25,18 @@ resources repository => 'http://github.com/robertkrimen/PACKAGE/tree/master';
 {
     map { my ($pk, $vr) = split m/\s/; build_requires $pk => $vr || 0 } grep { ! /^\s*#/ } split m/\n/, <<_END_;
 Test::Most
+Directory::Scratch
 _END_
 
     map { my ($pk, $vr) = split m/\s/; requires $pk => $vr || 0 } grep { ! /^\s*#/ } split m/\n/, <<_END_;
+App::GitHub::FindRepository
+Carp::Clan
+Digest::SHA1
+File::AtomicWrite
+File::Temp
+Getopt::Long
+Path::Class
+Term::Prompt
 _END_
 }
 
@@ -35,4 +46,3 @@ if (-e 'inc/.author') {
 }
 
 WriteAll;
-

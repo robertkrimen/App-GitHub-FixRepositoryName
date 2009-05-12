@@ -5,7 +5,7 @@ use strict;
 
 =head1 NAME
 
-App::GitHub::FixRepositoryName - Fix your .git/config if you change the case of your repository
+App::GitHub::FixRepositoryName - Fix your .git/config after a repository-name case change
 
 =head1 VERSION
 
@@ -15,8 +15,45 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
+
+    github-fix-repository-name .git/config
+
+    github-fix-repository-name My-Repository/ # ...should contain a .git directory
+
+    cd .git; github-fix-repository
+
+    # All of the above do the same thing, basically
+
+=head1 DESCRIPTION
+
+App::GitHub::FixRepositoryName will automatically find and update the github repository URLs in .git/config (so they have
+the right casing). It will first make a backup of your .git/config AND it will prompt you before writing out
+the new config (and show it to you first)
+
+=head1 INSTALL
+
+    cpan -i App::GitHub::FixRepositoryName
+
+=head1 USAGE
+
+=head2 github-fix-repository-name
+
+A commandline application that will fix a given .git/config to have the right repository name(s)
+
+    Usage: github-fix-repository-name [...] <path>
+
+        --backup-to <directory>     Backup 'config' to <directory> (default is the same directory)
+
+        --no-backup                 Do not make a backup first
+
+        --always-yes                Assume yes when asking to write out the new config
+
+        --help, -h, -?              This help
+
+    For example:
+
+        github-fix-repository-name .git/config
 
 =cut
 
@@ -59,19 +96,54 @@ sub fix {
 sub _find_right_url {
     my $self = shift;
     my $url = shift;
-    my $repository = App::GitHub::FindRepository->find( $url );
-    return $repository->url;
+    my $repository;
+    eval {
+        $repository = App::GitHub::FindRepository->find( $url );
+    };
+    warn $@ if $@;
+    return $repository->url if $repository;
+    return $url; # Put back what we originally had
+}
+
+sub do_usage(;$) {
+    my $error = shift;
+    warn $error if $error;
+    warn <<'_END_';
+
+Usage: github-fix-repository-name [...] <path>
+
+    --backup-to <directory>     Backup 'config' to <directory> (default is the same directory)
+
+    --no-backup                 Do not make a backup first
+
+    --always-yes                Assume yes when asking to write out the new config
+
+    --help, -h, -?              This help
+
+For example:
+
+    github-fix-repository-name .git/config
+
+_END_
+
+    exit -1 if $error;
 }
 
 sub run {
     my $self = shift;
 
-    my ($backup_to, $no_backup, $always_yes);
+    my ($backup_to, $no_backup, $always_yes, $help);
     GetOptions(
+        'help|h|?' => \$help,
         'backup-to=s' => \$backup_to,
         'no-backup' => \$no_backup,
         'always-yes|Y' => \$always_yes,
     );
+
+    if ($help) {
+        do_usage;
+        exit 0;
+    }
 
     my @fix = @ARGV ? @ARGV : qw/./;
     for my $path (@fix) {
@@ -93,14 +165,14 @@ sub _try_to_fix_file_or_directory {
         if ( -d "$path/.git" ) { # The directory contains .git
             $file = "$path/.git/config"; 
         }
-        elsif ( 6 == grep { -d "$path/$_" } qw/branches config hooks info objects refs/ ) { # Looks like we're actually in .git
+        elsif ( 6 == grep { -e "$path/$_" } qw/branches config hooks info objects refs/ ) { # Looks like we're actually in .git
             $file = "$path/config";
         }
         else {
             croak "Don't know how to fix directory \"$path\"";
         }
     }
-    elsif (-f $file ) {
+    elsif (-f $path ) {
         $file = $path;
     }
     else {
@@ -118,7 +190,7 @@ sub _try_to_fix_file_or_directory {
     my ($backup_file);
     my ($content, $original_content) = $self->fix_file( $file );
     if ($content eq $original_content) {
-        print "Nothing to do to \"$file\"\n" unless $silent;
+        $print->( "Nothing to do to \"$file\"\n" );
         return;
     }
     else {
